@@ -50,6 +50,7 @@ num_likes is not null
 ```
 
 - Use CTEs 
+
 As Teej says, CTEs are the closest thing SQL has to import statements. They help organize logic by isolating transformations. 
     - One business rule per CTE 
     For example, if you're calculating the 
