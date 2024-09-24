@@ -5,7 +5,7 @@ The original impetus for a SQL 201 project was [this tweet from Teej](https://x.
 
 ## Writing Debuggable SQL
 
-- Use trailing commas 
+### Use trailing commas 
 
 ```sql 
 -- it's easier to comment out columns in this 
@@ -25,7 +25,7 @@ SELECT
 FROM table 
 ```
 
-- Use a dummy column in your WHERE clause 
+### Use a dummy column in your WHERE clause 
 
 ```sql 
 -- it's easier to comment out filters in this 
@@ -49,10 +49,11 @@ WHERE --num_blocks > 0
 num_likes is not null 
 ```
 
-- Use CTEs 
+### Use CTEs 
 
-As Teej says, CTEs are the closest thing SQL has to import statements. They help organize logic by isolating transformations. 
-    - One business rule per CTE 
+As Teej says, CTEs are the closest thing SQL has to import statements. They help organize logic by isolating transformations.
+ 
+    #### One business rule per CTE 
     For example, if you're calculating the 
 
 ## Anti-patterns 
