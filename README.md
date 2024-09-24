@@ -9,42 +9,42 @@ The original impetus for a SQL 201 project was [this tweet from Teej](https://x.
 
 ```sql 
 -- it's easier to comment out columns in this 
-SELECT 
+select 
     user_id
     , timestamp 
     , num_likes
     -- , num_blocks 
-FROM table 
+from table 
 
 -- than in this 
-SELECT 
+select 
     user_id, 
     timestamp, 
     num_likes--, 
     --num_blocks 
-FROM table 
+from table 
 ```
 
 ### Use a dummy column in your WHERE clause 
 
 ```sql 
 -- it's easier to comment out filters in this 
-SELECT 
+select 
     user_id
     , timestamp 
     , num_likes
-FROM table 
-WHERE 1=1 
+from table 
+where 1=1 
 --AND num_blocks > 0 
-AND num_likes is not null 
+and num_likes is not null 
 
 -- than in this 
-SELECT 
+select 
     user_id, 
     timestamp, 
     num_likes
-FROM table 
-WHERE --num_blocks > 0
+from table 
+where --num_blocks > 0
 --AND  
 num_likes is not null 
 ```
@@ -53,9 +53,45 @@ num_likes is not null
 
 As Teej says, CTEs are the closest thing SQL has to import statements. They help organize logic by isolating transformations.
 
-    #### One business rule per CTE 
-    
-    For example, if you're calculating the 
+    **One business rule per CTE** is a good rule of thumb, just to keep things atomic. 
+
+```sql 
+with base as (
+    SELECT 
+        user_id 
+        , MAX(timstamp) latest_order 
+    FROM table 
+    WHERE 1=1 
+    group by 2 
+)
+select 
+base.user_id,
+orders.order_id 
+from base 
+left join orders 
+on base.user_id = orders.user_id 
+and base.latest_order = orders.placed_at
+``` 
+You can also write CTEs as sub-queries of a sort, but I personally find this harder to read. 
+
+```sql 
+with base as (
+    SELECT 
+        user_id 
+        , MAX(timstamp) latest_order 
+    FROM table 
+    WHERE 1=1 
+    group by 2 
+)
+select 
+base.user_id,
+orders.order_id 
+from base 
+left join orders 
+on base.user_id = orders.user_id 
+and base.latest_order = orders.placed_at
+```
 
 ## Anti-patterns 
 
+### Distinct 
