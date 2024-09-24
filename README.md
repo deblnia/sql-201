@@ -27,7 +27,32 @@ FROM table
 
 - Use a dummy column in your WHERE clause 
 
+```sql 
+-- it's easier to comment out filters in this 
+SELECT 
+    user_id
+    , timestamp 
+    , num_likes
+FROM table 
+WHERE 1=1 
+--AND num_blocks > 0 
+AND num_likes is not null 
+
+-- than in this 
+SELECT 
+    user_id, 
+    timestamp, 
+    num_likes
+FROM table 
+WHERE --num_blocks > 0
+--AND  
+num_likes is not null 
+```
+
 - Use CTEs 
+As Teej says, CTEs are the closest thing SQL has to import statements. They help organize logic by isolating transformations. 
+    - One business rule per CTE 
+    For example, if you're calculating the 
 
 ## Anti-patterns 
 
