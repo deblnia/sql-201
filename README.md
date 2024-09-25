@@ -7,12 +7,24 @@ The original impetus for a SQL 201 project was [this tweet from Teej](https://x.
     - [Use CTEs](#use-ctes)
 - [Anti-patterns](#anti-patterns)
     - [Distinct](#distinct)
-    - [Ordering any CTE but your last](#ordering-on-any-cte-but-your-last)
+    - [Ordering on any CTE but your last](#ordering-on-any-cte-but-your-last)
+    - [Correlated Subqueries](#correlated-subqueries)
 - [Gotchas](#gotchas)
     - [Filtering on the right table in a left join](#filtering-on-the-right-table-in-a-left-join)
-    - [COUNT(*) includes null values, COUNT(col) does not include null values ](#count-includes-null-values-countcol-does-not-include-null-values)
-    - [Use Exists Instead of In or Not In](#use-exists-instead-of-in-or-not-in)
-
+    - [COUNT(*) includes null values, COUNT(col) does not include null values](#count-includes-null-values-countcol-does-not-include-null-values)
+    - [Use EXISTS Instead of IN or NOT IN](#use-exists-instead-of-in-or-not-in)
+- [Joins](#joins)
+    - [Cross Joins](#cross-joins)
+    - [Self Joins](#self-joins)
+    - [Range Joins](#range-joins)
+- [Set Operations](#set-operations)
+- [Window Functions](#window-functions)
+- [String Stuff](#string-stuff)
+- [Non-standard Features](#non-standard-features)
+    - [Grouping Sets](#grouping-sets)
+    - [Rollups](#rollups)
+- [See Also](#see-also)
+    - [SQL Levels Explained](https://github.com/airbytehq/SQL-Levels-Explained)
 
 ## Writing Debuggable SQL
 
@@ -29,9 +41,9 @@ from table
 
 -- than in this 
 select 
-    user_id, 
-    timestamp, 
-    num_likes--, 
+    user_id 
+    , timestamp 
+    , num_likes--, 
     --num_blocks 
 from table 
 ```
@@ -51,9 +63,9 @@ and num_likes is not null
 
 -- than in this 
 select 
-    user_id, 
-    timestamp, 
-    num_likes
+    user_id
+    , timestamp 
+    , num_likes
 from table 
 where --num_blocks > 0
 --AND  
@@ -76,8 +88,8 @@ with base as (
     group by 2 
 )
 select 
-base.user_id,
-orders.order_id 
+    base.user_id
+    , orders.order_id 
 from base 
 left join orders 
 on base.user_id = orders.user_id 
@@ -129,14 +141,14 @@ Sorting is expensive, and should be avoided until necessary. If you need to do a
 -- intemediate ordering, not great 
 WITH base AS (
     select 
-        user_id, 
-        num_likes
+        user_id
+        , num_likes
     from table
     order by num_likes DESC  -- Pointless ordering here
 ), filtered_base AS (
     select 
-        user_id, 
-        num_likes
+        user_id
+        , num_likes
     from base 
     order by num_likes ASC  -- Re-ordering the same data again for no reason
 )
@@ -155,15 +167,34 @@ limit 1;
 
 ### Correlated Subqueries 
 
+These are usually subqueries in the WHERE clause to meet a specific filtering criteria. These can get very expensive since you're doing nested evaluation (the query executes once for every row in the main query, meaning that the inner query is driven by the outer one, unlike in a normal subquery where the inner query executes once and first), and are better off as atomic CTEs and explicit joins. 
 
+
+```sql
+-- correlated sub-query 
+select 
+    e.name
+    , e.salary
+from Employee e
+WHERE 1=1 
+    AND e.salary > (
+    SELECT AVG(salary)
+    FROM Employee
+    WHERE departmentId = e.departmentId
+    ) 
+```
+
+More examples on the [Wikipedia page](https://en.wikipedia.org/wiki/Correlated_subquery). 
 
 ## Gotchas 
 
 ### Filtering on the right table in a left join 
 
+Or vice versa! I am just a left-join purist. 
+
 SQL's execution process first performs the join (in this case, a LEFT JOIN) and then applies the filter in the WHERE clause. Since non-matching rows from the right table result in NULL values, those NULL rows won't pass the condition in the WHERE clause (like WHERE right_table.some_column = 'X'). As a result, those rows are filtered out, mimicking the behavior of an INNER JOIN.
 
-You can add filters to the ON clause of the join to get around this. 
+You can add filters to the ON clause of the join to get around this. The result table will still have everything in the left table, but only the right table info you've filtered for would be filled in. 
 
 ```sql 
 -- THIS IS EFFECTIVELY AN INNER JOIN! 
@@ -180,35 +211,93 @@ LEFT JOIN table_b
 ON table_a.id = table_b.id AND table_b.ds = CURRENT_DATE
 ``` 
 
+This is also slightly different between [Presto and Hive](https://teradata.github.io/presto/docs/141t/migration/from-hive.html). 
+
 ### COUNT(*) includes null values, COUNT(col) does not include null values 
 
 ### Use EXISTS instead of IN or NOT IN 
 
 In and not in do not count nulls. 
 
+### Case statements short circuit evaluate 
+
+This is slightly implementation specific, but can really trip up a query. A case statement will return the first true condition 
+
 ## Joins 
+
+If you want a more comprehensive introduction to how to think about joins, I'd suggest: 
+- [Julia Evans' nice rules for joins](https://wizardzines.com/comics/joins/)
+- [Sarah Anoke's intro to joins](https://sanoke.github.io/blog/datasci/sql-joins.html)
+- [Justin Jaffrey's ways of thinking about joins](https://justinjaffray.com/joins-13-ways)
+- [Randy Au's Can we stop with the SQL joins venn diagram insanity](https://counting.substack.com/p/can-we-stop-with-the-sql-joins-venn-diagrams-insanity-16791d9250c3?s=r)
 
 ### Cross Joins 
 
 
+
+
 ### Self Joins 
+
+If you join a table to itself, you get a sort of poor-man's version of nested iteration. For example, these two things are equivalent. 
+
+```sql 
+select id
+from table_a a 
+left join table_a a1 USING (id) 
+where a.time < a1.time 
+```
+```python 
+final_set = []
+
+for row in table_a: 
+	for same_row in table_a: 
+		if row[id] == same_row[id]:
+			if row[time] < same_row[time]:
+				final_set.append(row)
+```
+
+This can be especially useful in situations where data is hierarchical (eg. org charts), or you're trying to find relationships between rows (i.e. users with the same title but different pay). 
+
+Joining on id and using some time window filter is a pretty common pattern. 
 
 ### Range Joins 
 
+Range joins 
+
+### Anti-joins 
+
+
+
+## Set Operations 
+
+### UNION 
+
+
+### EXCEPT 
+
+
+### INTERSECT 
 
 ## Window Functions 
 
 
 ## String Stuff 
 
-## Set Operations 
+### Use || to concatenate strings 
+ 
+I had to use this to concatenate two rows to make my own unique ID per row once. 
+
+### Use < and > to de-dupe and alphabetize strings
 
 ## Non-standard Features 
 
 ### Grouping Sets 
 
-
 ### Rollups 
+
+### Cube 
 
 ## See Also 
 - [SQL Levels Explained](https://github.com/airbytehq/SQL-Levels-Explained)
+- Practice: 
+    - 
