@@ -239,12 +239,41 @@ Cross joins give a row for each possible pairing of a row from Table A and a row
 
 Comma joins are also default cross joins. 
 
-The common pattern that I see is cross-join unnest-ing a column that is a struct. 
+The common pattern that I see is cross-join unnest-ing to explode a struct. 
+
+Imagine this table: 
++---------+----------------------------+
+| user_id |     favorite_colors         |
++---------+----------------------------+
+|    1    | ["red", "blue"]             |
+|    2    | ["green", "yellow", "blue"] |
+|    3    | ["black"]                   |
++---------+----------------------------+
+
 
 ```sql 
-
+SELECT 
+    user_i 
+    , color
+FROM 
+    users, 
+    UNNEST(favorite_colors) AS color
 
 ```
+
+Gets: 
+
++---------+--------+
+| user_id | color  |
++---------+--------+
+|    1    |  red   |
+|    1    |  blue  |
+|    2    | green  |
+|    2    | yellow |
+|    2    |  blue  |
+|    3    | black  |
++---------+--------+
+
 
 ### Self Joins 
 
@@ -272,8 +301,21 @@ Joining on id and using some time window filter is a pretty common pattern.
 
 ### Range Joins 
 
-Range joins 
+Range joins are joins that involve a range of values (>=, <= etc.) instead of just strict equality. 
 
+```sql 
+SELECT 
+    e.employee_id 
+    , e.name
+    , e.salary
+    , s.bracket_name
+FROM 
+    employees e
+JOIN 
+    salary_brackets s
+ON 
+    e.salary BETWEEN s.min_salary AND s.max_salary
+```
 
 ## Set Operations 
 
