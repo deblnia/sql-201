@@ -9,7 +9,9 @@ The original impetus for a SQL 201 project was [this tweet from Teej](https://x.
     - [Distinct](#distinct)
     - [Ordering any CTE but your last](#ordering-on-any-cte-but-your-last)
 - [Gotchas](#gotchas)
+    - [Filtering on the right table in a left join](#filtering-on-the-right-table-in-a-left-join)
     - [COUNT(*) includes null values, COUNT(col) does not include null values ](#count-includes-null-values-countcol-does-not-include-null-values)
+    - [Use Exists Instead of In or Not In](#use-exists-instead-of-in-or-not-in)
 
 
 ## Writing Debuggable SQL
@@ -60,7 +62,7 @@ num_likes is not null
 
 ### Use CTEs 
 
-As Teej says, common table expressions (CTEs) are the closest thing SQL has to import statements. They help organize logic by isolating transformations.
+As Teej says, common table expressions (CTEs) are the closest thing SQL has to import statements. They help organize logic by isolating transformations, and let you define a sub-table to work with or from. 
 
     **One business rule per CTE** is a good rule of thumb, just to keep things atomic. 
 
@@ -81,7 +83,7 @@ left join orders
 on base.user_id = orders.user_id 
 and base.latest_order = orders.placed_at
 ``` 
-You can also write CTEs as sub-queries of a sort, but I personally find this harder to read. More jumping back and forth required IMO. 
+You can also write CTEs as sub-queries of a sort, but I personally find this harder to read. More jumping back and forth required IMO. This is most readable if you just want to do one subquery and join on and on, usually building up flags. 
 
 ```sql 
 select 
@@ -151,22 +153,32 @@ limit 1;
     qualify rank() over(order by num_likes desc) = 1 
 ``` 
 
+### Correlated Subqueries 
+
+
+
 ## Gotchas 
 
 ### Filtering on the right table in a left join 
 
 SQL's execution process first performs the join (in this case, a LEFT JOIN) and then applies the filter in the WHERE clause. Since non-matching rows from the right table result in NULL values, those NULL rows won't pass the condition in the WHERE clause (like WHERE right_table.some_column = 'X'). As a result, those rows are filtered out, mimicking the behavior of an INNER JOIN.
 
-```sql 
-select 
-    user_id 
-from table 
-left join another_table using (user_id)
-where 1=1 
-and another_table.column > 1 
-``` 
-
 You can add filters to the ON clause of the join to get around this. 
+
+```sql 
+-- THIS IS EFFECTIVELY AN INNER JOIN! 
+SELECT table.id 
+FROM table_a
+LEFT JOIN table_b 
+ON table_a.id = table_b.id
+WHERE table_b.ds = CURRENT_DATE
+
+-- Good left join :) 
+SELECT table.id, 
+FROM table_a
+LEFT JOIN table_b 
+ON table_a.id = table_b.id AND table_b.ds = CURRENT_DATE
+``` 
 
 ### COUNT(*) includes null values, COUNT(col) does not include null values 
 
@@ -181,10 +193,22 @@ In and not in do not count nulls.
 
 ### Self Joins 
 
+### Range Joins 
+
+
 ## Window Functions 
 
 
 ## String Stuff 
+
+## Set Operations 
+
+## Non-standard Features 
+
+### Grouping Sets 
+
+
+### Rollups 
 
 ## See Also 
 - [SQL Levels Explained](https://github.com/airbytehq/SQL-Levels-Explained)
