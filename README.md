@@ -8,6 +8,8 @@ The original impetus for a SQL 201 project was [this tweet from Teej](https://x.
 - [Anti-patterns](#anti-patterns)
     - [Distinct](#distinct)
     - [Ordering any CTE but your last](#ordering-on-any-cte-but-your-last)
+- [Gotchas](#gotchas)
+    - [COUNT(*) includes null values, COUNT(col) does not include null values ](#count-includes-null-values-countcol-does-not-include-null-values)
 
 
 ## Writing Debuggable SQL
@@ -119,14 +121,41 @@ qualify rank() over (partition over user_id order by timestamp desc) = 1
 
 ### Ordering on any CTE but your last 
 
+Sorting is expensive, and should be avoided until necessary. If you need to do any intermediate ordering, I would do it explicitly using a window function. 
 
+```sql 
+-- intemediate ordering, not great 
+WITH base AS (
+    select 
+        user_id, 
+        num_likes
+    from table
+    order by num_likes DESC  -- Pointless ordering here
+), filtered_base AS (
+    select 
+        user_id, 
+        num_likes
+    from base 
+    order by num_likes ASC  -- Re-ordering the same data again for no reason
+)
+select user_id 
+from filtered_base 
+order by num_likes desc  -- Final ordering that actually matters
+limit 1;
 
+-- better! 
+    select 
+        user_id 
+        , num_likes 
+    from table 
+    qualify rank() over(order by num_likes desc) = 1 
+``` 
 
 ## Gotchas 
 
 ### Filtering on the right table in a left join 
 
-This will default to an inner join since the 
+SQL's execution process first performs the join (in this case, a LEFT JOIN) and then applies the filter in the WHERE clause. Since non-matching rows from the right table result in NULL values, those NULL rows won't pass the condition in the WHERE clause (like WHERE right_table.some_column = 'X'). As a result, those rows are filtered out, mimicking the behavior of an INNER JOIN.
 
 ```sql 
 select 
@@ -137,18 +166,25 @@ where 1=1
 and another_table.column > 1 
 ``` 
 
+You can add filters to the ON clause of the join to get around this. 
+
 ### COUNT(*) includes null values, COUNT(col) does not include null values 
 
+### Use EXISTS instead of IN or NOT IN 
 
-
+In and not in do not count nulls. 
 
 ## Joins 
 
+### Cross Joins 
 
+
+### Self Joins 
 
 ## Window Functions 
 
 
+## String Stuff 
 
 ## See Also 
 - [SQL Levels Explained](https://github.com/airbytehq/SQL-Levels-Explained)
