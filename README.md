@@ -221,7 +221,9 @@ In and not in do not count nulls.
 
 ### Case statements short circuit evaluate 
 
-This is slightly implementation specific, but can really trip up a query. A case statement will return the first true condition 
+A case statement will return the first true condition it hits and not evaluate all the others, so you want your most restrictive conditions first. If no conditions hit and there's no else to default a result to, the case statement will return null. 
+
+This is slightly implementation specific, so definitely check the docs for your specific RDBMS.
 
 ## Joins 
 
@@ -233,8 +235,16 @@ If you want a more comprehensive introduction to how to think about joins, I'd s
 
 ### Cross Joins 
 
+Cross joins give a row for each possible pairing of a row from Table A and a row from Table B. They don't require any join keys, since they're exhaustive. 
+
+Comma joins are also default cross joins. 
+
+The common pattern that I see is cross-join unnest-ing a column that is a struct. 
+
+```sql 
 
 
+```
 
 ### Self Joins 
 
@@ -264,14 +274,25 @@ Joining on id and using some time window filter is a pretty common pattern.
 
 Range joins 
 
-### Anti-joins 
-
-
 
 ## Set Operations 
 
 ### UNION 
 
+Equivalent to a row bind. UNION ALL binds all rows, keeping duplicates. UNION doesn't keep duplicates. We usually prefer UNION ALL. 
+
+```sql
+select 
+    user_id 
+from table_for_one_day 
+
+union all 
+
+select 
+    user_id 
+from table_for_another_day 
+
+```
 
 ### EXCEPT 
 
@@ -299,5 +320,15 @@ I had to use this to concatenate two rows to make my own unique ID per row once.
 
 ## See Also 
 - [SQL Levels Explained](https://github.com/airbytehq/SQL-Levels-Explained)
+- [Mode's SQL Tutorial](https://mode.com/sql-tutorial)
+- [Teej's Funnel Patterns](https://github.com/teej/sf-funnels)
+- [Haki Benita's SQL for Data Analysis](https://hakibenita.com/sql-for-data-analysis)
+- [On the SQL Order of Operations](https://blog.jooq.org/a-beginners-guide-to-the-true-order-of-sql-operations/)
 - Practice: 
-    - 
+    - [Julia Evans join challenges](https://joins-238123.netlify.app/join-challenges/)
+    - [LeetCode SQL](https://leetcode.com/problemset/database/?page=1)
+    - [Beyond Leetcode SQL](https://github.com/shawlu95/Beyond-LeetCode-SQL)
+    - [8 Week SQL Challenge](https://8weeksqlchallenge.com/case-study-1/)
+    - [DataLemur](https://datalemur.com/)
+    - [Star SQL](https://selectstarsql.com/) 
+    - [Knightlab SQL Mystery](https://mystery.knightlab.com/walkthrough.html)
