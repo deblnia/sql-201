@@ -186,6 +186,10 @@ WHERE 1=1
 
 More examples on the [Wikipedia page](https://en.wikipedia.org/wiki/Correlated_subquery). 
 
+### Avoid using wildcards at the beginning of a string 
+
+E.g. (‘%jess%’ vs. ‘jess%’)
+
 ## Gotchas 
 
 ### Filtering on the right table in a left join 
@@ -347,8 +351,19 @@ What they sounds like. You can use this in the traditional set operation way - t
 
 Window functions let you do aggregations in place. They look something like this: 
 
+```sql 
+function_name OVER (PARTITION BY col_name1, col_name2, ...
+                    ORDER BY col_name3
+                    frame_clause)
+```
 
-You don't need to 
+The **partition** specifies the window over which the query is aggregating. The **order** specifies the order. The **frame clause** specifies a subset of the window (the set of rows relative to the current row used in computation). 
+
+I prefer keeping window functions in separate CTEs, not mixing them with group-by and summarize aggregations. You don't need to group by window functions, but the grain of the result can be confusing. You can also [ORDER BY an aggregation, but that needs to be grouped](https://stackoverflow.com/questions/65201713/why-use-group-by-in-window-function). 
+
+See also: 
+- [Understanding Window Functions](https://tapoueh.org/blog/2013/08/understanding-window-functions/)
+- [Sarah Anoke on Window Functions](https://sanoke.github.io/blog/datasci/sql-window.html)
 
 ## String Stuff 
 
@@ -359,6 +374,10 @@ I had to use this to concatenate two rows to make my own unique ID per row once.
 ### Use < and > to de-dupe and alphabetize strings
 
 ## Non-standard Features 
+
+### HAVING and QUALIFY 
+
+Can save some CTEs. HAVING filters on aggregations in place, and QUALIFY filers on window functions in place.  
 
 ### Grouping Sets 
 
