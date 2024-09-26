@@ -258,7 +258,9 @@ SELECT
 FROM 
     users, 
     UNNEST(favorite_colors) AS color
-
+    -- in presto this is 
+    -- CROSS JOIN UNNEST (users.favorite_colors) AS c(colors)
+    -- where the c is the new exploded table alias and colors is the column names 
 ```
 
 Gets: 
@@ -336,22 +338,17 @@ from table_for_another_day
 
 ```
 
-### EXCEPT 
+### EXCEPT AND INTERSECT 
 
-You can use this in the traditional set operation way (to difference two full queries) or you can use this as backwards column selection. 
-
-```sql 
-
-
-``` 
-
-### INTERSECT 
-
+What they sounds like. You can use this in the traditional set operation way - to difference two full queries - but they seem particularly powerful when the queries are pulling from two different tables. 
 
 
 ## Window Functions 
 
-- can you group by a window function? 
+Window functions let you do aggregations in place. They look something like this: 
+
+
+You don't need to 
 
 ## String Stuff 
 
