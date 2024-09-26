@@ -301,7 +301,7 @@ Joining on id and using some time window filter is a pretty common pattern.
 
 ### Range Joins 
 
-Range joins are joins that involve a range of values (>=, <= etc.) instead of just strict equality. 
+Range joins are joins that involve a range of values (>=, <= etc.) instead of just strict equality. They can be useful for funnels. 
 
 ```sql 
 SELECT 
@@ -338,11 +338,20 @@ from table_for_another_day
 
 ### EXCEPT 
 
+You can use this in the traditional set operation way (to difference two full queries) or you can use this as backwards column selection. 
+
+```sql 
+
+
+``` 
 
 ### INTERSECT 
 
+
+
 ## Window Functions 
 
+- can you group by a window function? 
 
 ## String Stuff 
 
@@ -359,6 +368,8 @@ I had to use this to concatenate two rows to make my own unique ID per row once.
 ### Rollups 
 
 ### Cube 
+
+### Pivot and Unpivot 
 
 ## See Also 
 - [SQL Levels Explained](https://github.com/airbytehq/SQL-Levels-Explained)
