@@ -387,6 +387,8 @@ Can save some CTEs. HAVING filters on aggregations in place, and QUALIFY filers 
 
 ### Pivot and Unpivot 
 
+### Offset 
+
 ## See Also 
 - [SQL Levels Explained](https://github.com/airbytehq/SQL-Levels-Explained)
 - [Mode's SQL Tutorial](https://mode.com/sql-tutorial)
