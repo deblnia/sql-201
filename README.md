@@ -389,6 +389,20 @@ Can save some CTEs. HAVING filters on aggregations in place, and QUALIFY filers 
 
 ### Offset 
 
+I prefer to use a window function to explicitly rank and then select from ranks, but `OFFSET` can be used in conjunction with `LIMIT` too. 
+
+```sql
+SELECT
+	EmployeeID
+	, FirstName
+	, LastName
+FROM Employees
+ORDER BY EmployeeID
+LIMIT 5
+OFFSET 5
+```
+This gives us employees 6-10. 
+
 ## See Also 
 - [SQL Levels Explained](https://github.com/airbytehq/SQL-Levels-Explained)
 - [Mode's SQL Tutorial](https://mode.com/sql-tutorial)
