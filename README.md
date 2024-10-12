@@ -202,14 +202,14 @@ You can add filters to the ON clause of the join to get around this. The result 
 
 ```sql 
 -- THIS IS EFFECTIVELY AN INNER JOIN! 
-SELECT table.id 
+SELECT table_a.id 
 FROM table_a
 LEFT JOIN table_b 
 ON table_a.id = table_b.id
 WHERE table_b.ds = CURRENT_DATE
 
 -- Good left join :) 
-SELECT table.id, 
+SELECT table_a.id, 
 FROM table_a
 LEFT JOIN table_b 
 ON table_a.id = table_b.id AND table_b.ds = CURRENT_DATE
@@ -217,8 +217,16 @@ ON table_a.id = table_b.id AND table_b.ds = CURRENT_DATE
 
 This is also slightly different between [Presto and Hive](https://teradata.github.io/presto/docs/141t/migration/from-hive.html). 
 
-Also note that this does not effect anti joins
+Also note that this does not effect anti-joins (as in below), since those explicitly deal with nulls. A left join only behaves like an inner join when you don't account for the null values in the right table. 
 
+```sql 
+-- An anti-join, just getting the days that are in table a that are not in table b 
+SELECT table_a.id 
+FROM table_a
+LEFT JOIN table_b 
+ON table_a.id = table_b.id
+WHERE table_b.ds is null 
+``` 
 
 ### COUNT(*) includes null values, COUNT(col) does not include null values 
 
