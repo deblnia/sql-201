@@ -192,7 +192,7 @@ E.g. (‘%jess%’ vs. ‘jess%’)
 
 ## Gotchas 
 
-### Filtering on the right table in a left join 
+### Filtering columns to a specific values in the right table when doing a left join 
 
 Or vice versa! I am just a left-join purist. 
 
@@ -216,6 +216,9 @@ ON table_a.id = table_b.id AND table_b.ds = CURRENT_DATE
 ``` 
 
 This is also slightly different between [Presto and Hive](https://teradata.github.io/presto/docs/141t/migration/from-hive.html). 
+
+Also note that this does not effect anti joins
+
 
 ### COUNT(*) includes null values, COUNT(col) does not include null values 
 
