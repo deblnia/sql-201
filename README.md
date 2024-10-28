@@ -232,7 +232,7 @@ WHERE table_b.ds is null
 
 ### Use EXISTS instead of IN or NOT IN 
 
-In and not in do not count nulls. 
+In and not in do not count nulls. Use them only when you're dealing with specific values and you know you won't get any NULLs. EXISTS and NOT EXISTS are better for verifying prescence / absence of relationships without needing exact matches. 
 
 ### Case statements short circuit evaluate 
 
