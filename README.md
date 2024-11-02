@@ -334,6 +334,8 @@ ON
     e.salary BETWEEN s.min_salary AND s.max_salary
 ```
 
+The BETWEEN predicate is inclusive (so both the bounds count as part of the range). The order of arguments is always lower_bound and upper_bound. 
+
 ## Set Operations 
 
 ### UNION 
