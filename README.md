@@ -422,6 +422,10 @@ This gives us employees 6-10.
 - [Teej's Funnel Patterns](https://github.com/teej/sf-funnels)
 - [Haki Benita's SQL for Data Analysis](https://hakibenita.com/sql-for-data-analysis)
 - [On the SQL Order of Operations](https://blog.jooq.org/a-beginners-guide-to-the-true-order-of-sql-operations/)
+- Style Guides:
+    - [Simon Holywell's](https://www.sqlstyle.guide/)
+    - [Mazur's](https://github.com/mattm/sql-style-guide)
+    - [Brooklyn Data's](https://github.com/brooklyn-data/co/blob/main/sql_style_guide.md)
 - Practice: 
     - [Julia Evans join challenges](https://joins-238123.netlify.app/join-challenges/)
     - [LeetCode SQL](https://leetcode.com/problemset/database/?page=1)
