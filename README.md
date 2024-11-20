@@ -377,6 +377,7 @@ I prefer keeping window functions in separate CTEs, not mixing them with group-b
 See also: 
 - [Understanding Window Functions](https://tapoueh.org/blog/2013/08/understanding-window-functions/)
 - [Sarah Anoke on Window Functions](https://sanoke.github.io/blog/datasci/sql-window.html)
+- [Yuan Meng's Notes](https://yuanm.notion.site/window-functions-0a792ad76e90400d9381df0931e0c990) 
 
 ## String Stuff 
 
