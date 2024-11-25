@@ -257,6 +257,7 @@ Comma joins are also default cross joins.
 The common pattern that I see is cross-join unnest-ing to explode a struct. 
 
 Imagine this table: 
+
 +---------+----------------------------+
 | user_id |     favorite_colors         |
 +---------+----------------------------+
