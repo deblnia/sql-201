@@ -258,13 +258,11 @@ The common pattern that I see is cross-join unnest-ing to explode a struct.
 
 Imagine this table: 
 
-+---------+----------------------------+
-| user_id |     favorite_colors         |
-+---------+----------------------------+
-|    1    | ["red", "blue"]             |
-|    2    | ["green", "yellow", "blue"] |
-|    3    | ["black"]                   |
-+---------+----------------------------+
+| user_id | favorite_colors           |
+|---------|---------------------------|
+| 1       | ["red", "blue"]           |
+| 2       | ["green", "yellow", "blue"] |
+| 3       | ["black"]                 |
 
 
 ```sql 
@@ -281,17 +279,14 @@ FROM
 
 Gets: 
 
-+---------+--------+
-| user_id | color  |
-+---------+--------+
-|    1    |  red   |
-|    1    |  blue  |
-|    2    | green  |
-|    2    | yellow |
-|    2    |  blue  |
-|    3    | black  |
-+---------+--------+
-
+| user_id | color   |
+|---------|---------|
+| 1       | red     |
+| 1       | blue    |
+| 2       | green   |
+| 2       | yellow  |
+| 2       | blue    |
+| 3       | black   |
 
 ### Self Joins 
 
