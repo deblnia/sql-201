@@ -385,9 +385,48 @@ I had to use this to concatenate two rows to make my own unique ID per row once.
 
 ## Non-standard Features 
 
-### HAVING and QUALIFY 
+### Having  
 
-Can save some CTEs. HAVING filters on aggregations in place, and QUALIFY filers on window functions in place.  
+Can save some CTEs. HAVING filters on aggregations in place, but still requires grouping! It's late in the order of execution.  
+
+```sql
+-- no having 
+with no_having as (
+	select
+		user_id
+		, count(*) num 
+	from examples
+	where 1=1
+	group by 1
+)
+select
+	user_id 
+from no_having
+where 1=1
+and num > 5
+
+-- equivalent to
+select
+	user_id 
+from examples
+where 1=1
+group by 1 
+having count(*) > 5 
+```
+
+### Qualify 
+
+Can save some CTEs. QUALIFY filers on window functions in place. Commonly used to de-dupe. 
+
+```
+-- deduping with qualify. filtering just for the most recent row 
+select
+	user_id
+	, ts 
+from examples
+where 1=1
+qualify rank() over(partition by user_id order by ts desc) = 1  
+```
 
 ### Grouping Sets 
 
