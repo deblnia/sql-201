@@ -418,7 +418,7 @@ having count(*) > 5
 
 Can save some CTEs. QUALIFY filers on window functions in place. Commonly used to de-dupe. 
 
-```
+```sql
 -- deduping with qualify. filtering just for the most recent row 
 select
 	user_id
